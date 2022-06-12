@@ -15,13 +15,21 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //タスク一覧取得
-        $tasks = Task::all();
+        if (\Auth::check()) { 
+            //タスク一覧取得
+            $tasks = Task::all();
         
-        //タスク一覧ビューをそれで表示
-        return view('tasks.index', [
-            'tasks' => $tasks,
-        ]);
+            //タスク一覧ビューをそれで表示
+            return view('tasks.index', [
+                'tasks' => $tasks,
+            ]);
+            
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
+        }
+        else {
+            return view('welcome');
+        }
+        
     }
 
     /**
@@ -56,6 +64,7 @@ class TaskController extends Controller
         $task = new Task;
         $task->status = $request->status; //追加
         $task->content = $request->content;
+        $task->user_id = \Auth::id();
         $task->save();
         
         //トップページへリダイレクトさせる
@@ -77,6 +86,12 @@ class TaskController extends Controller
         return view('tasks.show', [
             'task' => $task,
         ]);
+        //タスク表示
+        if (\Auth::id() === $task->user_id) {
+            $task->view();
+        }
+        //トップページへリダイレクトさせる
+        return redirect('/');
     }
 
     /**
@@ -94,6 +109,13 @@ class TaskController extends Controller
         return view('tasks.edit', [
             'task' =>$task,
         ]);
+        
+        //タスク編集
+        if (\Auth::id() === $task->user_id) {
+            $task->edit();
+        }
+        //トップページへリダイレクトさせる
+        return redirect('/');
     }
 
     /**
@@ -132,8 +154,9 @@ class TaskController extends Controller
         //idの値でタスクを検索して取得
         $task = Task::findOrFail($id);
         //タスク削除
-        $task->delete();
-        
+        if (\Auth::id() === $task->user_id) {
+            $task->delete();
+        }
         //トップページへリダイレクトさせる
         return redirect('/');
     }

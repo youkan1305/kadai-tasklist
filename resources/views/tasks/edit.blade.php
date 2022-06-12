@@ -17,9 +17,11 @@
                     {!! Form::label('status', 'status:') !!}
                     {!! Form::text('status', null, ['class' => 'form-control']) !!}
                 </div>
-
+                
+                @if (Auth::id() == $task->user_id)
+                {!! Form::model($task, ['route' => ['tasks.edit', $task->id], 'method' => 'edit']) !!}
                 {!! Form::submit('更新', ['class' => 'btn btn-primary']) !!}
-
+                @endif
             {!! Form::close() !!}
         </div>
     </div>
