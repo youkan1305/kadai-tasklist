@@ -26,5 +26,5 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout.get');
 
 //アクセスした際に認証を必要とする場所
 Route::group(['middleware' => ['auth']], function () {
-    Route::resource('users', 'TaskController', ['only' => ['index', 'create', 'show', 'edit']]);
+    Route::resource('users', 'TaskController', ['only' => ['index', 'show', 'edit']]);
 });
